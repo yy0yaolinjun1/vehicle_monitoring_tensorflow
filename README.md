@@ -30,8 +30,23 @@ This project is written in python and the vehicle detection is based on Tensorfl
 
 11) Avoiding repetitive detection(method1: setting the frame interval for each lane. method2: only when the vehicle pass through the leave detection area could the vehicle be detected again)
 
+v1.1 new capabilities
+12)Double line crossing detection:(notice: since detecting the vehicle through the width of detected bounding box and because of the perspective projection,
+the width of the vehicle bounding box that first appears in the video is large,which may lead to error detection and therefore,modifying the interest area is needed)
+<p align="center">
+  <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/double_line_crossing.JPG">
+</p>
+the image below is the width of bounding box that first appears in lane first after modifying the interest area(the width becomes narrower than before) .
+<p align="center">
+  <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/interest_area_modified.JPG">
+</p>
+13)Converse moving detection:
+<p align="center">
+  <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/converse_crossing.jpg">
+</p>
+
 ## Installation
 install tensorflow_cpu
 installation guide:(https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest)
 
-ps:pip install missing_package_name
+ps:pip install missing_package_name,and please press 'q' to quit the preview before running video detection(one of the bugs that needed to be fixed...)
