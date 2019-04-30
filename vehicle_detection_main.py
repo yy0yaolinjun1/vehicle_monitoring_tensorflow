@@ -33,6 +33,7 @@ from utils.vehicle_detection_module.vehicle_detection_api import *
 from utils.image_utils import image_saver
 from tkinter import *           
 from tkinter import ttk,Entry,Label,LabelFrame
+
 MODEL_NAME = 'ssdlite_mobilenet_v2_coco_2018_05_09'
 MODEL_FILE = MODEL_NAME + '.tar.gz'
 DOWNLOAD_BASE = \
@@ -69,11 +70,11 @@ LINE_CROSSING_DETECTION_POS_RIGHT=1600
 #store multiple repeative car image.As a result,the interval(based on the current frame number)is needed
 LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE=8
 #the area of traffic light :suppose only detecting one light [125:140,895:915]
-OFFSET=10 
-TRAFFIC_LIGHT_POS_TOP=120
-TRAFFIC_LIGHT_POS_BOTTOM=150
-TRAFFIC_LIGHT_POS_LEFT=885
-TRAFFIC_LIGHT_POS_RIGHT=925
+OFFSET=6 
+TRAFFIC_LIGHT_POS_TOP=124
+TRAFFIC_LIGHT_POS_BOTTOM=144
+TRAFFIC_LIGHT_POS_LEFT=890
+TRAFFIC_LIGHT_POS_RIGHT=920
 
 DETECTED_LIGHT_COLOR='green'#default color
 #roi pos of lane first START:Xstart END:Xend
@@ -119,6 +120,8 @@ SPEED_LIMIT=30
 #convert piexl to real length in order to calculate the vehicle speed (suppose 1pixel~=0.02m)
 PIXEL_TO_REAL_LENGTH=0.02 
 PIXEL_HEIGHT_COMPENSATE=0.0001
+
+LINE_BOTTOM_HEIGHT=300
 
 CURRENT_PATH=os.getcwd()
 
@@ -692,6 +695,7 @@ def load_roi_configuration():
     global TRAFFIC_LIGHT_POS_BOTTOM
     global TRAFFIC_LIGHT_POS_LEFT
     global TRAFFIC_LIGHT_POS_RIGHT
+    global LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE
     roi_configuration_files_path= CURRENT_PATH+'/roi_configuration_files'
     default_file_name=(VIDEO_FILE_PATH.split('/')[-1]).split('.')[0]
     
@@ -759,6 +763,7 @@ def load_roi_configuration():
     PIXEL_TO_REAL_LENGTH=float(PIXEL_TO_REAL_LENGTH)
     PIXEL_HEIGHT_COMPENSATE=float(PIXEL_HEIGHT_COMPENSATE)
     LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE=float(LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE)
+
     print(default_file_name,'roi info: ',roi)
     #set the new value 
     interest_area_x_start.set(INTEREST_AREA_X_START)
@@ -863,8 +868,8 @@ def draw_roi_preview(frame):
     if(is_lane_first_available.get()==True):
         cv2.putText(input_frame,'line crossing detection area',(left_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(0, 240, 0),2)
         
-        cv2.line(input_frame,(left_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_first_end.get(),line_crossing_detection_pos_top.get()+300),(0,240,0),4)
-        cv2.line(input_frame,(right_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_first_end.get(),line_crossing_detection_pos_top.get()+300),(0,255,0),4)    
+        cv2.line(input_frame,(left_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_first_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
+        cv2.line(input_frame,(right_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_first_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)    
                 
         cv2.putText(input_frame,'speed detection area',(left_speed_detection_position_lane_first.get(),speed_detection_position_lane_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(18, 74, 115),2)      
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_first.get(),speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_first.get(),speed_detection_position_lane_bottom.get()),(18, 74, 115),3)               
@@ -872,14 +877,14 @@ def draw_roi_preview(frame):
         cv2.putText(input_frame,'leave detection area',(left_speed_detection_position_lane_first.get(),leave_speed_detection_position_lane_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(0, 0, 200),2)
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_first.get(),leave_speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_first.get(),leave_speed_detection_position_lane_bottom.get()),(0, 0, 200),2)
     if(is_lane_second_available.get()==True):
-        cv2.line(input_frame,(left_detection_position_lane_second_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_second_end.get(),line_crossing_detection_pos_top.get()+300),(0,240,0),4)
-        cv2.line(input_frame,(right_detection_position_lane_second_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_second_end.get(),line_crossing_detection_pos_top.get()+300),(0,255,0),4)                    
+        cv2.line(input_frame,(left_detection_position_lane_second_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_second_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
+        cv2.line(input_frame,(right_detection_position_lane_second_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_second_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)                    
 
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_second.get(),speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_second.get(),speed_detection_position_lane_bottom.get()),(18, 74, 115),3)                   
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_second.get(),leave_speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_second.get(),leave_speed_detection_position_lane_bottom.get()),(0, 0, 200),2)
     if(is_lane_third_available.get()==True):
-        cv2.line(input_frame,(left_detection_position_lane_third_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_third_end.get(),line_crossing_detection_pos_top.get()+300),(0,240,0),4)
-        cv2.line(input_frame,(right_detection_position_lane_third_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_third_end.get(),line_crossing_detection_pos_top.get()+300),(0,255,0),4)                    
+        cv2.line(input_frame,(left_detection_position_lane_third_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_third_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
+        cv2.line(input_frame,(right_detection_position_lane_third_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_third_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)                    
 
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_third.get(),speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_third.get(),speed_detection_position_lane_bottom.get()),(18, 74, 115),3)                   
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_third.get(),leave_speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_third.get(),leave_speed_detection_position_lane_bottom.get()),(0, 0, 200),2)
@@ -986,80 +991,82 @@ def object_detection_function():
                        LEFT_SPEED_DETECTION_POSITION_LANE_THIRD,RIGHT_SPEED_DETECTION_POSITION_LANE_THIRD,
                        LEAVE_SPEED_DETECTION_POSITION_LANE_TOP,LEAVE_SPEED_DETECTION_POSITION_LANE_BOTTOM,
                        LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE,PIXEL_TO_REAL_LENGTH,PIXEL_HEIGHT_COMPENSATE,
-                       DETECTED_LIGHT_COLOR,SPEED_LIMIT)
+                       DETECTED_LIGHT_COLOR,SPEED_LIMIT,LEFT_DETECTION_POSITION_LANE_FIRST_END)
+
     with detection_graph.as_default():
-        with tf.Session(graph=detection_graph) as sess:
+            with tf.Session(graph=detection_graph) as sess:
+    
+                # Definite input and output Tensors for detection_graph
+                image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+    
+                # Each box represents a part of the image where a particular object was detected.
+                detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+    
+                # Each score represent how level of confidence for each of the objects.
+                # Score is shown on the result image, together with the class label.
+                detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+                detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+                num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+                
+    
+                # for all the frames that are extracted from input video
+                while cap.isOpened():
+                    (ret, frame) = cap.read()
+    
+                    if not ret:
+                        print ('end of the video file...')
+                        break
+    
+                    input_frame = frame
+                    #the start point(x,y) of interest area
+                    #detect the vehicle in certain area to enhance performance
+                    #starty:endy,startx:endx 
+                    traffic_light_area_img=frame[TRAFFIC_LIGHT_POS_TOP+OFFSET:TRAFFIC_LIGHT_POS_BOTTOM-OFFSET,TRAFFIC_LIGHT_POS_LEFT+OFFSET:TRAFFIC_LIGHT_POS_RIGHT-OFFSET]
+                    #get the color of traffic light and pass the color to detection
+                    predicted_color = color_recognition_api.color_recognition(traffic_light_area_img)    
 
-            # Definite input and output Tensors for detection_graph
-            image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-
-            # Each box represents a part of the image where a particular object was detected.
-            detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-
-            # Each score represent how level of confidence for each of the objects.
-            # Score is shown on the result image, together with the class label.
-            detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
-            detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
-            num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-            
-
-            # for all the frames that are extracted from input video
-            while cap.isOpened():
-                (ret, frame) = cap.read()
-
-                if not ret:
-                    print ('end of the video file...')
-                    break
-
-                input_frame = frame
-                #the start point(x,y) of interest area
-                #detect the vehicle in certain area to enhance performance
-                #starty:endy,startx:endx 
-                traffic_light_area_img=frame[TRAFFIC_LIGHT_POS_TOP+OFFSET:TRAFFIC_LIGHT_POS_BOTTOM-OFFSET,TRAFFIC_LIGHT_POS_LEFT+OFFSET:TRAFFIC_LIGHT_POS_RIGHT-OFFSET]
-                #get the color of traffic light and pass the color to detection
-                predicted_color = color_recognition_api.color_recognition(traffic_light_area_img)    
-               
-                vehicle_detection_api.set_current_light_color(predicted_color)
-
-                interest_area=frame[INTEREST_AREA_Y_START:INTEREST_AREA_Y_END,INTEREST_AREA_X_START:INTEREST_AREA_X_END]
-               
-                #[1, None, None, 3]
-                image_np_expanded = np.expand_dims(interest_area, axis=0)
-
-                # Actual detection.
-                (boxes, scores, classes, num) = \
-                    sess.run([detection_boxes, detection_scores,
-                             detection_classes, num_detections],
-                             feed_dict={image_tensor: image_np_expanded})
-
-                # Visualization of the results of a detection.
-                (counter, csv_line) = \
-                    vis_util.visualize_boxes_and_labels_on_image_array(
-                    cap.get(1),
-                    input_frame,
-                    np.squeeze(boxes),
-                    np.squeeze(classes).astype(np.int32),
-                    np.squeeze(scores),
-                    category_index,
-                    use_normalized_coordinates=True,
-                    line_thickness=2,
-                    skip_scores=True,
-                    interest_area_xpos_start=INTEREST_AREA_X_START,
-                    interest_area_ypos_start=INTEREST_AREA_Y_START,
-                    interest_area_xpos_end=INTEREST_AREA_X_END,
-                    interest_area_ypos_end=INTEREST_AREA_Y_END
-                    )
-                #draw roi on the video 
-                draw_roi(input_frame,counter)
-
-                cv2.namedWindow('vehicle detection',cv2.WINDOW_NORMAL)
-                cv2.imshow('vehicle detection', input_frame)
-
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
-            cap.release()
-            cv2.destroyAllWindows()
+                    vehicle_detection_api.set_current_light_color(predicted_color)
+    
+                    interest_area=frame[INTEREST_AREA_Y_START:INTEREST_AREA_Y_END,INTEREST_AREA_X_START:INTEREST_AREA_X_END]
+                   
+                    #[1, None, None, 3]
+                    image_np_expanded = np.expand_dims(interest_area, axis=0)
+    
+                    # Actual detection.
+                    
+                    (boxes, scores, classes, num) = \
+                        sess.run([detection_boxes, detection_scores,
+                                 detection_classes, num_detections],
+                                 feed_dict={image_tensor: image_np_expanded})
+    
+                    # Visualization of the results of a detection.
+                    (counter, csv_line) = \
+                        vis_util.visualize_boxes_and_labels_on_image_array(
+                        cap.get(1),
+                        input_frame,
+                        np.squeeze(boxes),
+                        np.squeeze(classes).astype(np.int32),
+                        np.squeeze(scores),
+                        category_index,
+                        use_normalized_coordinates=True,
+                        line_thickness=2,
+                        skip_scores=True,
+                        interest_area_xpos_start=INTEREST_AREA_X_START,
+                        interest_area_ypos_start=INTEREST_AREA_Y_START,
+                        interest_area_xpos_end=INTEREST_AREA_X_END,
+                        interest_area_ypos_end=INTEREST_AREA_Y_END
+                        )
+                    #draw roi on the video 
+                    draw_roi(input_frame,counter)
+    
+                    cv2.namedWindow('vehicle detection',cv2.WINDOW_NORMAL)
+                    cv2.imshow('vehicle detection', input_frame)
+    
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+    
+                cap.release()
+                cv2.destroyAllWindows()
 class DatabaseUI(tk.Toplevel):
   db_vehicle_name = 'vehicle_database.db'
   path=os.getcwd()+'/database_detected_vehicles_images'

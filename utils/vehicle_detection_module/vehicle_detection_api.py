@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 from utils.image_utils import image_saver
 
+
+is_doubled_solid_line_detection_in_interval=False
+last_detected_frame_of_doubled_solid_line_detection=0
+is_doubled_solid_line_crossing_detected=[0]
+WIDTH_OF_TURNING_VEHICLE=500
+
 is_vehicle_detected = [0]
 
 is_vehicle_detected_lane_first_in_interval=False
@@ -68,13 +74,24 @@ PIXEL_TO_REAL_LENGTH=0 #(suppose 1pixel~=0.02m)
 PIXEL_HEIGHT_COMPENSATE=0 #per pixel increase 0.0002 perspective projection,with vehicle moving forward,the distance 1pixel = higher distance
 
 DETECTED_LIGHT_COLOR=''
-is_in_detection=False
+is_running_red_line=False
 current_light_color=''
 
 is_overspeed_detection_in_lane_first_in_interval=False
 is_overspeed_detection_in_lane_second_in_interval=False
 is_overspeed_detection_in_lane_third_in_interval=False
 
+is_converse_crossing_in_lane_first_in_interval=False
+is_converse_crossing_in_lane_second_in_interval=False
+is_converse_crossing_in_lane_third_in_interval=False
+detected_pixel_length_of_converse_crossing_in_lane_first=[0]
+detected_pixel_length_of_converse_crossing_in_lane_second=[0]
+detected_pixel_length_of_converse_crossing_in_lane_third=[0]
+last_detected_frame_of_converse_crossing_in_lane_first=[0]
+last_detected_frame_of_converse_crossing_in_lane_second=[0]
+last_detected_frame_of_converse_crossing_in_lane_third=[0]
+
+is_converse_running=False
 
 SPEED_LIMIT=0
 FPS=25 #the fps depends on the video
@@ -93,13 +110,28 @@ def reset_stored_value():
     global last_frame_bottom_position_of_detected_vehicle_in_lane_first
     global last_frame_bottom_position_of_detected_vehicle_in_lane_second
     global last_frame_bottom_position_of_detected_vehicle_in_lane_third
-    global is_in_detection
+    global is_running_red_line
     global is_overspeed_detection_in_lane_first_in_interval
     global is_overspeed_detection_in_lane_second_in_interval
     global is_overspeed_detection_in_lane_third_in_interval
     global last_detected_overspeed_frame_in_speed_detection_area_first
     global last_detected_overspeed_frame_in_speed_detection_area_second
     global last_detected_overspeed_frame_in_speed_detection_area_third
+    global is_doubled_solid_line_detection_in_interval
+    global last_detected_frame_of_doubled_solid_line_detection
+    global is_doubled_solid_line_crossing_detected
+    
+    global is_converse_crossing_in_lane_first_in_interval
+    global is_converse_crossing_in_lane_second_in_interval
+    global is_converse_crossing_in_lane_third_in_interval
+    global detected_pixel_length_of_converse_crossing_in_lane_first
+    global detected_pixel_length_of_converse_crossing_in_lane_second
+    global detected_pixel_length_of_converse_crossing_in_lane_third
+    global last_detected_frame_of_converse_crossing_in_lane_first
+    global last_detected_frame_of_converse_crossing_in_lane_second
+    global last_detected_frame_of_converse_crossing_in_lane_third
+    
+    
     is_vehicle_detected = [0]
     is_vehicle_detected_lane_first_in_interval=False
     last_detected_frame_in_lane_first=0
@@ -116,7 +148,8 @@ def reset_stored_value():
     last_frame_bottom_position_of_detected_vehicle_in_lane_second=[0]
     last_frame_bottom_position_of_detected_vehicle_in_lane_third=[0]
     
-    is_in_detection=False
+    
+    is_running_red_line=False
     
     is_overspeed_detection_in_lane_first_in_interval=False
     is_overspeed_detection_in_lane_second_in_interval=False
@@ -125,6 +158,19 @@ def reset_stored_value():
     last_detected_overspeed_frame_in_speed_detection_area_second=[0]
     last_detected_overspeed_frame_in_speed_detection_area_third=[0]
     
+    is_doubled_solid_line_detection_in_interval=False
+    last_detected_frame_of_doubled_solid_line_detection=0
+    is_doubled_solid_line_crossing_detected=[0]
+    
+    is_converse_crossing_in_lane_first_in_interval=False
+    is_converse_crossing_in_lane_second_in_interval=False
+    is_converse_crossing_in_lane_third_in_interval=False
+    detected_pixel_length_of_converse_crossing_in_lane_first=[0]
+    detected_pixel_length_of_converse_crossing_in_lane_second=[0]
+    detected_pixel_length_of_converse_crossing_in_lane_third=[0]
+    last_detected_frame_of_converse_crossing_in_lane_first=[0]
+    last_detected_frame_of_converse_crossing_in_lane_second=[0]
+    last_detected_frame_of_converse_crossing_in_lane_third=[0]
     
 def set_roi_value(line_crossing_detection_pos_top=0,line_crossing_detection_pos_bottom=0,
                   is_lane_first_available=True,is_lane_second_available=True,is_lane_third_available=True,
@@ -137,7 +183,7 @@ def set_roi_value(line_crossing_detection_pos_top=0,line_crossing_detection_pos_
                   left_speed_detection_pos_lane_third=0,right_speed_detection_pos_lane_third=0,
                   leave_speed_detection_position_lane_top=0,leave_speed_detection_position_lane_bottom=0,
                   line_crossing_detection_interval_in_each_lane=1,pixel_to_real_length=0,pixel_height_compensate=0,
-                  detected_light_color='',speed_limit=0):
+                  detected_light_color='',speed_limit=0,left_detection_first_end=0):
     global LINE_CROSSING_DETECTION_POS_TOP
     global LINE_CROSSING_DETECTION_POS_BOTTOM
     
@@ -174,6 +220,8 @@ def set_roi_value(line_crossing_detection_pos_top=0,line_crossing_detection_pos_
     global DETECTED_LIGHT_COLOR
     
     global SPEED_LIMIT
+    
+    global LEFT_DETECTION_FIRST_END
     LINE_CROSSING_DETECTION_POS_TOP = line_crossing_detection_pos_top
     LINE_CROSSING_DETECTION_POS_BOTTOM = line_crossing_detection_pos_bottom
     IS_LANE_FIRST_AVAILABLE = is_lane_first_available
@@ -188,6 +236,8 @@ def set_roi_value(line_crossing_detection_pos_top=0,line_crossing_detection_pos_
     PIXEL_HEIGHT_COMPENSATE=pixel_height_compensate
     DETECTED_LIGHT_COLOR=detected_light_color
     SPEED_LIMIT=speed_limit
+    # LEFT_DETECTION_FIRST_END is used to detect doubled solid lines crossing
+    LEFT_DETECTION_FIRST_END=left_detection_first_end
     if(IS_LANE_FIRST_AVAILABLE):
         LEFT_DETECTION_POSITION_LANE_FIRST=left_detection_pos_first_start
         RIGHT_DETECTION_POSITION_LANE_FIRST=right_detection_pos_first_end
@@ -238,6 +288,11 @@ def vehicle_detect(
     
     speed = -1  # means not available, it is just initialization
     speed_direction=-1 #bottom to top
+    
+    global is_doubled_solid_line_detection_in_interval
+    global last_detected_frame_of_doubled_solid_line_detection
+    global is_doubled_solid_line_crossing_detected
+    
     global is_vehicle_detected_lane_first_in_interval
     global last_detected_frame_in_lane_first
     global is_vehicle_detected_lane_second_in_interval
@@ -261,7 +316,7 @@ def vehicle_detect(
     global is_in_lane_third
     global DETECTED_LIGHT_COLOR
      
-    global is_in_detection
+    global is_running_red_line
     
     global SPEED_LIMIT
     
@@ -273,10 +328,39 @@ def vehicle_detect(
     global last_detected_overspeed_frame_in_speed_detection_area_second
     global last_detected_overspeed_frame_in_speed_detection_area_third
     
-    if current_light_color==DETECTED_LIGHT_COLOR:
-        is_in_detection=True
+    global is_converse_crossing_in_lane_first_in_interval
+    global is_converse_crossing_in_lane_second_in_interval
+    global is_converse_crossing_in_lane_third_in_interval
+    global detected_pixel_length_of_converse_crossing_in_lane_first
+    global detected_pixel_length_of_converse_crossing_in_lane_second
+    global detected_pixel_length_of_converse_crossing_in_lane_third
+    global last_detected_frame_of_converse_crossing_in_lane_first
+    global last_detected_frame_of_converse_crossing_in_lane_second
+    global last_detected_frame_of_converse_crossing_in_lane_third
+    
+    
+    
+    global LEFT_DETECTION_FIRST_END
+    global is_converse_running
+    if current_light_color!=DETECTED_LIGHT_COLOR and current_light_color!='black':
+        is_running_red_line=True
     else:
-        is_in_detection=False
+        is_running_red_line=False
+    #detect crossing double solid line  vehicle
+    #using (right-left)length to judge whether vehicle is turning  default length is 500
+    is_doubled_solid_line_crossing_detected=[0]
+    is_converse_running=False
+    
+    if(bottom>LINE_CROSSING_DETECTION_POS_BOTTOM):
+        if(left<(LEFT_DETECTION_POSITION_LANE_FIRST+LEFT_DETECTION_FIRST_END)*0.5 and right>LEFT_DETECTION_POSITION_LANE_FIRST and right-left>WIDTH_OF_TURNING_VEHICLE and right-left<2*WIDTH_OF_TURNING_VEHICLE and is_doubled_solid_line_detection_in_interval==False):
+            is_doubled_solid_line_detection_in_interval=True
+            print('doubled solid line crossing vehicle detected')
+            is_doubled_solid_line_crossing_detected.insert(0, 1)
+            last_detected_frame_of_doubled_solid_line_detection=current_frame_number
+        if(current_frame_number-last_detected_frame_of_doubled_solid_line_detection>LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE and is_doubled_solid_line_detection_in_interval==True):
+            is_doubled_solid_line_detection_in_interval=False
+    
+    #is_doubled_solid_line_detection_in_interval
     #detect line_crosssing vehicles
     if LINE_CROSSING_DETECTION_POS_TOP < bottom \
         and bottom < LINE_CROSSING_DETECTION_POS_BOTTOM :
@@ -310,6 +394,21 @@ def vehicle_detect(
         if left>LEFT_SPEED_DETECTION_POSITION_LANE_FIRST and right<RIGHT_SPEED_DETECTION_POSITION_LANE_FIRST:
             is_in_lane_first=True
             pixel_first_length = speed_direction*(bottom - last_frame_bottom_position_of_detected_vehicle_in_lane_first[0])
+            #by determining whether the pixel_first_length is postive or not to judge whether the vehicle is converse running
+            detected_pixel_length_of_converse_crossing_in_lane_first.insert(0,pixel_first_length)
+            if(pixel_first_length<0):
+                if(len(detected_pixel_length_of_converse_crossing_in_lane_first)>2):
+                    #as sometimes the position returned by Tensorflow may have deviation which will lead to negative result,we should judge the result more than 1 times to avoid this error
+                    if(detected_pixel_length_of_converse_crossing_in_lane_first[0]<0 and detected_pixel_length_of_converse_crossing_in_lane_first[1]<0 and detected_pixel_length_of_converse_crossing_in_lane_first[2]<0 and abs(detected_pixel_length_of_converse_crossing_in_lane_first[0]-detected_pixel_length_of_converse_crossing_in_lane_first[1])<50):
+                        if(is_converse_crossing_in_lane_first_in_interval==False):
+                            print(detected_pixel_length_of_converse_crossing_in_lane_first)
+                            print('converse running !')
+                            last_detected_frame_of_converse_crossing_in_lane_first.insert(0,current_frame_number)
+                            is_converse_running=True
+                            is_converse_crossing_in_lane_first_in_interval=True
+                            detected_pixel_length_of_converse_crossing_in_lane_first=[0]
+                    if(current_frame_number-last_detected_frame_of_converse_crossing_in_lane_first[0]>LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE and is_converse_crossing_in_lane_first_in_interval==True):
+                            is_converse_crossing_in_lane_first_in_interval=False
             if pixel_first_length>0 and current_frame_number_lane_first_list[0]!=0:
                 offset_first_lane=speed_direction*(bottom - LINE_CROSSING_DETECTION_POS_BOTTOM)*PIXEL_HEIGHT_COMPENSATE
                 total_frame_passed = current_frame_number - current_frame_number_lane_first_list[0]
@@ -329,6 +428,20 @@ def vehicle_detect(
         if left>LEFT_SPEED_DETECTION_POSITION_LANE_SECOND and right<RIGHT_SPEED_DETECTION_POSITION_LANE_SECOND:
             is_in_lane_second=True 
             pixel_second_length = speed_direction*(bottom - last_frame_bottom_position_of_detected_vehicle_in_lane_second[0])
+            detected_pixel_length_of_converse_crossing_in_lane_second.insert(0,pixel_second_length)
+            if(pixel_second_length<0):
+                if(len(detected_pixel_length_of_converse_crossing_in_lane_second)>2):
+                    #as sometimes the position returned by Tensorflow may have deviation which will lead to negative result,we should judge the result more than 1 times to avoid this error
+                    if(detected_pixel_length_of_converse_crossing_in_lane_second[0]<0 and detected_pixel_length_of_converse_crossing_in_lane_second[1]<0 and detected_pixel_length_of_converse_crossing_in_lane_second[2]<0 and abs(detected_pixel_length_of_converse_crossing_in_lane_second[0]-detected_pixel_length_of_converse_crossing_in_lane_second[1])<50):
+                        if(is_converse_crossing_in_lane_second_in_interval==False):
+                            print(detected_pixel_length_of_converse_crossing_in_lane_second)
+                            print('converse running !')
+                            last_detected_frame_of_converse_crossing_in_lane_second.insert(0,current_frame_number)
+                            is_converse_running=True
+                            is_converse_crossing_in_lane_second_in_interval=True
+                            detected_pixel_length_of_converse_crossing_in_lane_second=[0]
+                    if(current_frame_number-last_detected_frame_of_converse_crossing_in_lane_second[0]>LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE and is_converse_crossing_in_lane_second_in_interval==True):
+                            is_converse_crossing_in_lane_second_in_interval=False
             if pixel_second_length>0 and current_frame_number_lane_second_list[0]!=0:
                 offset_second_lane=speed_direction*(bottom - LINE_CROSSING_DETECTION_POS_BOTTOM)*PIXEL_HEIGHT_COMPENSATE
                 total_frame_passed = current_frame_number - current_frame_number_lane_second_list[0]
@@ -346,6 +459,20 @@ def vehicle_detect(
         if left>LEFT_SPEED_DETECTION_POSITION_LANE_THIRD and right<RIGHT_SPEED_DETECTION_POSITION_LANE_THIRD:
             is_in_lane_third=True
             pixel_third_length = speed_direction*(bottom - last_frame_bottom_position_of_detected_vehicle_in_lane_third[0])
+            detected_pixel_length_of_converse_crossing_in_lane_third.insert(0,pixel_third_length)
+            if(pixel_third_length<0):
+                if(len(detected_pixel_length_of_converse_crossing_in_lane_third>2)):
+                    #as sometimes the position returned by Tensorflow may have deviation which will lead to negative result,we should judge the result more than 1 times to avoid this error
+                    if(detected_pixel_length_of_converse_crossing_in_lane_third[0]<0 and detected_pixel_length_of_converse_crossing_in_lane_third[1]<0 and detected_pixel_length_of_converse_crossing_in_lane_third[2]<0 and abs(detected_pixel_length_of_converse_crossing_in_lane_third[0]-detected_pixel_length_of_converse_crossing_in_lane_third[1])<50):
+                        if(is_converse_crossing_in_lane_third_in_interval==False):
+                            print(detected_pixel_length_of_converse_crossing_in_lane_third)
+                            print('converse running !')
+                            last_detected_frame_of_converse_crossing_in_lane_third.insert(0,current_frame_number)
+                            is_converse_running=True
+                            is_converse_crossing_in_lane_third_in_interval=True
+                            detected_pixel_length_of_converse_crossing_in_lane_third=[0]
+                    if(current_frame_number-last_detected_frame_of_converse_crossing_in_lane_third[0]>LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE and is_converse_crossing_in_lane_third_in_interval==True):
+                            is_converse_crossing_in_lane_third_in_interval=False
             if pixel_third_length>0 and current_frame_number_lane_third_list[0]!=0:
                 offset_third_lane=speed_direction*(bottom - LINE_CROSSING_DETECTION_POS_BOTTOM)*PIXEL_HEIGHT_COMPENSATE
                 total_frame_passed = current_frame_number - current_frame_number_lane_third_list[0]
@@ -390,7 +517,5 @@ def vehicle_detect(
                 current_frame_number_lane_third_list=[0]
                 last_frame_bottom_position_of_detected_vehicle_in_lane_third=[0]
                 is_in_leave_lane_third=False
-
-
-
-    return (speed, is_vehicle_detected,is_in_detection)
+    
+    return (speed, is_vehicle_detected,is_running_red_line,is_doubled_solid_line_crossing_detected,is_converse_running)
