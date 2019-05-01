@@ -1,4 +1,4 @@
-# Traffic Monitoring System
+# Vehicle Monitoring System
 This project is written in python and the vehicle detection is based on Tensorflow_Object_Detection_API
 [**Demo Link**](https://www.bilibili.com/video/av48336782/)
 <p align="center">
@@ -31,6 +31,7 @@ This project is written in python and the vehicle detection is based on Tensorfl
 11) Avoiding repetitive detection(method1: setting the frame interval for each lane. method2: only when the vehicle pass through the leave detection area could the vehicle be detected again)
 
 v1.1 new capabilities
+
 12)Double line crossing detection:(notice: since detecting the vehicle through the width of detected bounding box and because of the perspective projection,
 the width of the vehicle bounding box that first appears in the video is large,which may lead to error detection and therefore,modifying the interest area is needed)
 <p align="center">
