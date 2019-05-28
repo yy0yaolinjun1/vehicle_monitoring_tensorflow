@@ -342,7 +342,7 @@ def vehicle_detect(
     
     global LEFT_DETECTION_FIRST_END
     global is_converse_running
-    if current_light_color!=DETECTED_LIGHT_COLOR and current_light_color!='black':
+    if current_light_color==DETECTED_LIGHT_COLOR and current_light_color!='black':
         is_running_red_line=True
     else:
         is_running_red_line=False

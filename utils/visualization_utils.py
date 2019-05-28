@@ -719,7 +719,7 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
                  if is_running_red_light==True:
                      print('img  store')
                      image_saver.store_line_crossing_car_image(current_image,VIDEO_FILE_NAME)
-                     image_saver.store_detected_vehicles_into_database(current_image,VIDEO_FILE_NAME,1,0)
+                     image_saver.store_detected_vehicles_into_database(current_image,VIDEO_FILE_NAME+'_RunningRedLight',1,0)
                  counter = 1
                  del is_vehicle_detected[:]
                  is_vehicle_detected = []
@@ -743,7 +743,7 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
                 print('overspeed detected!')
                  #store the individual vehicle image
                 image_saver.store_overspeed_car_image(current_ovrerspeed_image,predicted_speed,VIDEO_FILE_NAME)
-                image_saver.store_detected_vehicles_into_database(current_ovrerspeed_image,VIDEO_FILE_NAME,0,1)
+                image_saver.store_detected_vehicles_into_database(current_ovrerspeed_image,VIDEO_FILE_NAME+'_OverSpeed',0,1)
                 
   return counter, csv_line_util
 

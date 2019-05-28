@@ -46,8 +46,13 @@ the image below is the width of bounding box that first appears in lane first af
   <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/converse_crossing.jpg">
 </p>
 
+
+
+
 ## Installation
 install tensorflow_cpu
 installation guide:(https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest)
 
-ps:pip install missing_package_name,and please press 'q' to quit the preview before running video detection(one of the bugs that needed to be fixed...)
+ps:1)pip install missing_package_name
+   2)please press 'q' to quit the preview before running video detection(one of the bugs that needed to be fixed...)
+   3)For Chinese Users:文件路径不能带有中文，否则通过CV2写入图片会失败OVO//
