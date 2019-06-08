@@ -5,6 +5,15 @@ This project is written in python and the vehicle detection is based on Tensorfl
   <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/main_ui.png">
 </p>
 
+the processing speed of the video is about 8FPS(Detection model:mobilenet_v2. CPU:I700hq).If you pursue a higher processing speed,you could use YOLO_V3 instead.[**YOLO_V3 configuration tutorial Reference(Chinese)**](https://blog.csdn.net/KID_yuan/article/details/88380269)
+
+the speed of YOLO_V3 is about 20 to 35FPS(the speed based on the number of objects in video) (Detection model: YOLO_V3. GPU:GTX1070. CPU:I700hq)
+<p align="center">
+  <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/Fps_YoloV3.JPG">
+</p>
+
+
+
 ## General Capabilities of This Project
 
 1) Real-time traffic monitoring(using ssd_mobilenet_v2 Model,more detection model see here https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md)
