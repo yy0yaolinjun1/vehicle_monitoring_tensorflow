@@ -68,7 +68,7 @@ the width of the vehicle bounding box that first appears in the video is large,w
 		2.2)TRAFFIC_JAM_INTERVAL_REFRESH_COUNT:to calculate the vehicle count more accurately(default value:25,which means thatevery time the vehicle is detected in the detection area, the corresponding counter will be added 1,once  the counter reach 25,the value that used to record the frame number when the vehicle is detected in the current lane will be set to the current video frame number,and the counter will be reset.)
 		2.3)LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE:if the (current frame number) - (the frame number that the vehicle is last detectd in the detection area)>DETECTION_INTERVAL,the vehicle will be considered to have left the corresponding detection area and therefore,the vehicle could be detected again in the area.
 		2.4)WIDTH_OF_TURNING_VEHICLE:it is used to detect the vehicle that crossing the double solid line if (right-left)>WIDTH_OF_TURNING_VEHICLE
-		2.5)
+	3)the width of the detection area should not be too wide
 	
 ## User Guide
 ## Installation
@@ -81,6 +81,7 @@ ps:1)pip install missing_package_name
    2)please press 'q' to quit the preview before running video detection(one of the bugs that needed to be fixed...)
    3)For Chinese Users:文件路径不能带有中文，否则通过CV2写入图片会失败OVO//
    
-future work(if time allows OvO):1)optmizing converse running detection
-							    2)UI modification
-							    3)using YOLO_V3
+##future work(if time allows ~OvO~):
+								  1)optmizing converse running detection
+								  2)UI modification
+							      3)using YOLO_V3
