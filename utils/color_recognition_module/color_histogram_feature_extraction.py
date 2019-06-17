@@ -55,16 +55,8 @@ def color_histogram_of_training_image(img_name):
         data_source = 'yellow'
     elif 'green' in img_name:
         data_source = 'green'
-    elif 'orange' in img_name:
-        data_source = 'orange'
-    elif 'white' in img_name:
-        data_source = 'white'
     elif 'black' in img_name:
         data_source = 'black'
-    elif 'blue' in img_name:
-        data_source = 'blue'
-    elif 'violet' in img_name:
-        data_source = 'violet'
     # load the image
     image = cv2.imread(img_name)
     chans = cv2.split(image)
@@ -104,18 +96,8 @@ def training():
     for f in os.listdir('./training_dataset/green'):
         color_histogram_of_training_image('./training_dataset/green/' + f)
 
-    # orange color training images
-    for f in os.listdir('./training_dataset/orange'):
-        color_histogram_of_training_image('./training_dataset/orange/' + f)
-
-    # white color training images
-    for f in os.listdir('./training_dataset/white'):
-        color_histogram_of_training_image('./training_dataset/white/' + f)
 
     # black color training images
     for f in os.listdir('./training_dataset/black'):
         color_histogram_of_training_image('./training_dataset/black/' + f)
 
-    # blue color training images
-    for f in os.listdir('./training_dataset/blue'):
-        color_histogram_of_training_image('./training_dataset/blue/' + f)

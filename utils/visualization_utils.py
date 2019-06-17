@@ -30,7 +30,7 @@ from utils.vehicle_detection_module import vehicle_detection_api
 from utils.color_recognition_module import color_recognition_api
 from matplotlib import pyplot as plt
 # Variables
-is_vehicle_detected = [0]
+is_vehicle_detected = False
 is_doubled_solid_line_crossing_detected=[0]
 is_converse_running=False
 _TITLE_LEFT_MARGIN = 10
@@ -194,7 +194,7 @@ def draw_bounding_box_on_image(current_frame_number,image,
       coordinates as absolute.
   """
   csv_line = "" # to create new csv line consists of vehicle type, predicted_speed, color and predicted_direction
-  is_vehicle_detected = [0]
+  is_vehicle_detected = False
   is_doubled_solid_line_crossing_detected=[0]
   is_converse_running=False
   is_running_red_light=False
@@ -583,7 +583,7 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
   # that correspond to the same location.
   csv_line_util = "not_available"
   counter = 0
-  is_vehicle_detected = []
+  is_vehicle_detected = False
   is_doubled_solid_line_crossing_detected=[]
   is_converse_running=False
   box_to_display_str_map = collections.defaultdict(list)
@@ -676,7 +676,6 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
                  image_saver.store_line_crossing_car_image(current_image,VIDEO_FILE_NAME)
                  
                  image_saver.store_detected_vehicles_into_database(current_image,VIDEO_FILE_NAME+'_DoubledLine',1,0)
-                 counter=1
                  del is_doubled_solid_line_crossing_detected[:]
                  is_doubled_solid_line_crossing_detected = []
             if(is_converse_running==True):
@@ -698,7 +697,7 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
                 image_saver.store_line_crossing_car_image(current_image,VIDEO_FILE_NAME)
                 image_saver.store_detected_vehicles_into_database(current_image,VIDEO_FILE_NAME+'_ConverseRunning',1,0)
                 is_converse_running=False
-            if(1 in is_vehicle_detected):
+            if(is_vehicle_detected==True):
                  current_image = origin_image.copy()
                  draw_single_bounding_box_on_image_array(current_image,
                  ymin,
@@ -715,15 +714,16 @@ def visualize_boxes_and_labels_on_image_array(current_frame_number,image,
                  interest_area_ypos_end=interest_area_ypos_end
                  )
                  
+                 counter = 1
+                 
                  #store the individual vehicle image
                  if is_running_red_light==True:
                      print('img  store')
                      image_saver.store_line_crossing_car_image(current_image,VIDEO_FILE_NAME)
                      image_saver.store_detected_vehicles_into_database(current_image,VIDEO_FILE_NAME+'_RunningRedLight',1,0)
-                 counter = 1
-                 del is_vehicle_detected[:]
-                 is_vehicle_detected = []
-                 
+#                 del is_vehicle_detected[:]
+#                 is_vehicle_detected = []
+                 is_vehicle_detected=False
             if(predicted_speed >SPEED_LIMIT):
                 current_ovrerspeed_image = origin_image.copy()
                 draw_single_bounding_box_on_image_array(current_ovrerspeed_image,

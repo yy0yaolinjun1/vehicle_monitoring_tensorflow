@@ -49,9 +49,9 @@ NUM_CLASSES = 90
 
 #position of interest area : Tensorflow only recognize the vehicle in interest area
 INTEREST_AREA_X_START=300
-INTEREST_AREA_Y_START=280
-INTEREST_AREA_X_END=1850
-INTEREST_AREA_Y_END=1000
+INTEREST_AREA_Y_START=420
+INTEREST_AREA_X_END=1700
+INTEREST_AREA_Y_END=1060
 
 ##position of the roi area(only when the position of the car is between ROI_TOP_POSITION and ROI_BOTTOM_POSSTION will it be detected by vehicle_detection_api
 #ROI_TOP_POSITION = INTEREST_AREA_Y_START
@@ -59,16 +59,16 @@ INTEREST_AREA_Y_END=1000
 
 IS_LANE_FIRST_AVAILABLE=True
 IS_LANE_SECOND_AVAILABLE=True
-IS_LANE_THIRD_AVAILABLE=False
+IS_LANE_THIRD_AVAILABLE=True
 #the area of the line_crossing detection line height=LINE_CROSSING_DETECTION_POS_BOTTOM-LINE_CROSSING_DETECTION_POS_TOP
-LINE_CROSSING_DETECTION_POS_TOP=710
-LINE_CROSSING_DETECTION_POS_BOTTOM=740
+LINE_CROSSING_DETECTION_POS_TOP=0
+LINE_CROSSING_DETECTION_POS_BOTTOM=0
 
-LINE_CROSSING_DETECTION_POS_LEFT=400
-LINE_CROSSING_DETECTION_POS_RIGHT=1600
+LINE_CROSSING_DETECTION_POS_LEFT=0
+LINE_CROSSING_DETECTION_POS_RIGHT=0
 #As the line_crossing ROI has a width, the same vehicle may be detected in consecutive frames and therefore,will lead to
 #store multiple repeative car image.As a result,the interval(based on the current frame number)is needed
-LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE=8
+LINE_CROSSING_DETECTION_INTERVAL_IN_EACH_LANE=6
 #the area of traffic light :suppose only detecting one light [125:140,895:915]
 OFFSET=6 
 TRAFFIC_LIGHT_POS_TOP=124
@@ -79,15 +79,15 @@ TRAFFIC_LIGHT_POS_RIGHT=920
 DETECTED_LIGHT_COLOR='green'#default color
 #roi pos of lane first START:Xstart END:Xend
 
-LEFT_DETECTION_POSITION_LANE_FIRST_START=400
-LEFT_DETECTION_POSITION_LANE_FIRST_END=120
-RIGHT_DETECTION_POSITION_LANE_FIRST_START=830
-RIGHT_DETECTION_POSITION_LANE_FIRST_END=730
+LEFT_DETECTION_POSITION_LANE_FIRST_START=0
+LEFT_DETECTION_POSITION_LANE_FIRST_END=0
+RIGHT_DETECTION_POSITION_LANE_FIRST_START=0
+RIGHT_DETECTION_POSITION_LANE_FIRST_END=0
 #roi pos of lane second START:Xstart END:Xend
-LEFT_DETECTION_POSITION_LANE_SECOND_START=850
-LEFT_DETECTION_POSITION_LANE_SECOND_END=750
-RIGHT_DETECTION_POSITION_LANE_SECOND_START=1230
-RIGHT_DETECTION_POSITION_LANE_SECOND_END=1330
+LEFT_DETECTION_POSITION_LANE_SECOND_START=0
+LEFT_DETECTION_POSITION_LANE_SECOND_END=0
+RIGHT_DETECTION_POSITION_LANE_SECOND_START=0
+RIGHT_DETECTION_POSITION_LANE_SECOND_END=0
 
 #roi pos of lane third START:Xstart END:Xend
 LEFT_DETECTION_POSITION_LANE_THIRD_START=0
@@ -96,22 +96,22 @@ RIGHT_DETECTION_POSITION_LANE_THIRD_START=0
 RIGHT_DETECTION_POSITION_LANE_THIRD_END=0
 
 #the width of the speed detection roi TOP:Ystart BOTTOM:Yend
-SPEED_DETECTION_POSITION_LANE_TOP=600
-SPEED_DETECTION_POSITION_LANE_BOTTOM=700
+SPEED_DETECTION_POSITION_LANE_TOP=670
+SPEED_DETECTION_POSITION_LANE_BOTTOM=740
 #roi pos of lane first LEFT:Xstart RIGHT:Xend
-LEFT_SPEED_DETECTION_POSITION_LANE_FIRST=400
-RIGHT_SPEED_DETECTION_POSITION_LANE_FIRST=830
+LEFT_SPEED_DETECTION_POSITION_LANE_FIRST=450
+RIGHT_SPEED_DETECTION_POSITION_LANE_FIRST=800
 #roi pos of lane second LEFT:Xstart RIGHT:Xend
 LEFT_SPEED_DETECTION_POSITION_LANE_SECOND=850
-RIGHT_SPEED_DETECTION_POSITION_LANE_SECOND=1250
+RIGHT_SPEED_DETECTION_POSITION_LANE_SECOND=1200
 #roi pos of lane third LEFT:Xstart RIGHT:Xend
-LEFT_SPEED_DETECTION_POSITION_LANE_THIRD=0
-RIGHT_SPEED_DETECTION_POSITION_LANE_THIRD=0
+LEFT_SPEED_DETECTION_POSITION_LANE_THIRD=1250
+RIGHT_SPEED_DETECTION_POSITION_LANE_THIRD=1600
 
 
 #detect whether the car has leave in order to calculate the speed more accurately
-LEAVE_SPEED_DETECTION_POSITION_LANE_TOP=SPEED_DETECTION_POSITION_LANE_TOP-200
-LEAVE_SPEED_DETECTION_POSITION_LANE_BOTTOM=SPEED_DETECTION_POSITION_LANE_TOP-10
+LEAVE_SPEED_DETECTION_POSITION_LANE_TOP=0
+LEAVE_SPEED_DETECTION_POSITION_LANE_BOTTOM=0
 
 DETECTION_LINE_HEIGHT=LINE_CROSSING_DETECTION_POS_TOP
 DETECTION_LINE_HEIGHT_END=DETECTION_LINE_HEIGHT+300
@@ -130,6 +130,9 @@ VIDEO_FILE_PATH=CURRENT_PATH+'/videos/'+'video-01.avi'
 VIDEO_FILE_NAME='video-01'
 
 roi_configuration_info=''
+
+TOTAL_PASSED_VEHICLE_COUNT=0
+font = cv2.FONT_HERSHEY_SIMPLEX
 def activate_database():
     database_window  = VehicleInfo()
 #    vehicles_info()
@@ -868,23 +871,23 @@ def draw_roi_preview(frame):
     if(is_lane_first_available.get()==True):
         cv2.putText(input_frame,'line crossing detection area',(left_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(0, 240, 0),2)
         
-        cv2.line(input_frame,(left_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_first_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
-        cv2.line(input_frame,(right_detection_position_lane_first_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_first_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)    
+        cv2.line(input_frame,(left_detection_position_lane_first_start.get(),speed_detection_position_lane_top.get()),(left_detection_position_lane_first_end.get(),speed_detection_position_lane_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
+        cv2.line(input_frame,(right_detection_position_lane_first_start.get(),speed_detection_position_lane_top.get()),(right_detection_position_lane_first_end.get(),speed_detection_position_lane_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)    
                 
-        cv2.putText(input_frame,'speed detection area',(left_speed_detection_position_lane_first.get(),speed_detection_position_lane_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(18, 74, 115),2)      
+        cv2.putText(input_frame,'vehicle detection area',(left_speed_detection_position_lane_first.get(),speed_detection_position_lane_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(18, 74, 115),2)      
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_first.get(),speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_first.get(),speed_detection_position_lane_bottom.get()),(18, 74, 115),3)               
         
         cv2.putText(input_frame,'leave detection area',(left_speed_detection_position_lane_first.get(),leave_speed_detection_position_lane_top.get()-text_offset_y),1,cv2.FONT_HERSHEY_COMPLEX,(0, 0, 200),2)
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_first.get(),leave_speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_first.get(),leave_speed_detection_position_lane_bottom.get()),(0, 0, 200),2)
     if(is_lane_second_available.get()==True):
-        cv2.line(input_frame,(left_detection_position_lane_second_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_second_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
-        cv2.line(input_frame,(right_detection_position_lane_second_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_second_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)                    
+        cv2.line(input_frame,(left_detection_position_lane_second_start.get(),speed_detection_position_lane_top.get()),(left_detection_position_lane_second_end.get(),speed_detection_position_lane_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
+        cv2.line(input_frame,(right_detection_position_lane_second_start.get(),speed_detection_position_lane_top.get()),(right_detection_position_lane_second_end.get(),speed_detection_position_lane_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)                    
 
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_second.get(),speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_second.get(),speed_detection_position_lane_bottom.get()),(18, 74, 115),3)                   
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_second.get(),leave_speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_second.get(),leave_speed_detection_position_lane_bottom.get()),(0, 0, 200),2)
     if(is_lane_third_available.get()==True):
-        cv2.line(input_frame,(left_detection_position_lane_third_start.get(),line_crossing_detection_pos_top.get()),(left_detection_position_lane_third_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
-        cv2.line(input_frame,(right_detection_position_lane_third_start.get(),line_crossing_detection_pos_top.get()),(right_detection_position_lane_third_end.get(),line_crossing_detection_pos_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)                    
+        cv2.line(input_frame,(left_detection_position_lane_third_start.get(),speed_detection_position_lane_top.get()),(left_detection_position_lane_third_end.get(),speed_detection_position_lane_top.get()+LINE_BOTTOM_HEIGHT),(0,240,0),4)
+        cv2.line(input_frame,(right_detection_position_lane_third_start.get(),speed_detection_position_lane_top.get()),(right_detection_position_lane_third_end.get(),speed_detection_position_lane_top.get()+LINE_BOTTOM_HEIGHT),(0,255,0),4)                    
 
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_third.get(),speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_third.get(),speed_detection_position_lane_bottom.get()),(18, 74, 115),3)                   
         cv2.rectangle(input_frame,(left_speed_detection_position_lane_third.get(),leave_speed_detection_position_lane_top.get()),(right_speed_detection_position_lane_third.get(),leave_speed_detection_position_lane_bottom.get()),(0, 0, 200),2)
@@ -911,10 +914,11 @@ def load_image_into_numpy_array(image):
     return np.array(image.getdata()).reshape((im_height, im_width,
             3)).astype(np.uint8)
 def draw_roi(input_frame,counter):
+    global TOTAL_PASSED_VEHICLE_COUNT
+    
     input_frame=input_frame
-    counter=counter
     #these two variables are only used to draw roi,not for detection 
-    DETECTION_LINE_HEIGHT=LINE_CROSSING_DETECTION_POS_TOP
+    DETECTION_LINE_HEIGHT=SPEED_DETECTION_POSITION_LANE_TOP
     DETECTION_LINE_HEIGHT_END=DETECTION_LINE_HEIGHT+300
     #traffic light area
     cv2.rectangle(input_frame,(TRAFFIC_LIGHT_POS_LEFT,TRAFFIC_LIGHT_POS_TOP),(TRAFFIC_LIGHT_POS_RIGHT,TRAFFIC_LIGHT_POS_BOTTOM),(0, 0, 255),2)
@@ -944,7 +948,7 @@ def draw_roi(input_frame,counter):
         cv2.line(input_frame,(LEFT_DETECTION_POSITION_LANE_THIRD_START,DETECTION_LINE_HEIGHT),(LEFT_DETECTION_POSITION_LANE_THIRD_END,DETECTION_LINE_HEIGHT_END),(0,255,0),4)
         cv2.line(input_frame,(RIGHT_DETECTION_POSITION_LANE_THIRD_START,DETECTION_LINE_HEIGHT),(RIGHT_DETECTION_POSITION_LANE_THIRD_END,DETECTION_LINE_HEIGHT_END),(0,255,0),4)
         #draw roi of third lane speed detection Brown
-        cv2.rectangle(input_frame,(LEFT_SPEED_DETECTION_POSITION_LANE_SECOND,SPEED_DETECTION_POSITION_LANE_TOP),(RIGHT_SPEED_DETECTION_POSITION_LANE_SECOND,SPEED_DETECTION_POSITION_LANE_BOTTOM),(18, 74, 115),3)
+        cv2.rectangle(input_frame,(LEFT_SPEED_DETECTION_POSITION_LANE_THIRD,SPEED_DETECTION_POSITION_LANE_TOP),(RIGHT_SPEED_DETECTION_POSITION_LANE_THIRD,SPEED_DETECTION_POSITION_LANE_BOTTOM),(18, 74, 115),3)
         #draw roi of third third leave detection 'Red'
         cv2.rectangle(input_frame,(LEFT_SPEED_DETECTION_POSITION_LANE_THIRD,LEAVE_SPEED_DETECTION_POSITION_LANE_TOP),(RIGHT_SPEED_DETECTION_POSITION_LANE_THIRD,LEAVE_SPEED_DETECTION_POSITION_LANE_BOTTOM),(0, 0, 200),2)
         #draw the roi of lane-transgressing detection and when the vehicle cross the line it will turn red.
@@ -952,6 +956,19 @@ def draw_roi(input_frame,counter):
         cv2.rectangle(input_frame,(LINE_CROSSING_DETECTION_POS_LEFT,LINE_CROSSING_DETECTION_POS_TOP),(LINE_CROSSING_DETECTION_POS_RIGHT,LINE_CROSSING_DETECTION_POS_BOTTOM),(0,0,220),3)
     else:
         cv2.rectangle(input_frame,(LINE_CROSSING_DETECTION_POS_LEFT,LINE_CROSSING_DETECTION_POS_TOP),(LINE_CROSSING_DETECTION_POS_RIGHT,LINE_CROSSING_DETECTION_POS_BOTTOM),(0,255,0),3)
+    
+    TOTAL_PASSED_VEHICLE_COUNT=TOTAL_PASSED_VEHICLE_COUNT+counter
+
+    cv2.putText(
+            input_frame,
+            'total_vehicle_count_in: ' + str(TOTAL_PASSED_VEHICLE_COUNT),
+            (10, 40),
+            font,
+            2,
+            (0, 235, 140),
+            5,
+            cv2.FONT_HERSHEY_SIMPLEX,
+            )
 # Download Model
 # uncomment if you have not download the model yet
 # Load a (frozen) Tensorflow model into memory.
@@ -972,12 +989,16 @@ categories = label_map_util.convert_label_map_to_categories(label_map,
 
 category_index = label_map_util.create_category_index(categories)
 
+def reset_vehicle_count():
+    global TOTAL_PASSED_VEHICLE_COUNT
+    TOTAL_PASSED_VEHICLE_COUNT=0
 # Detection
 def object_detection_function():
     cap = cv2.VideoCapture(VIDEO_FILE_PATH)
     
     
     vis_util.set_detection_area_value(INTEREST_AREA_Y_START,INTEREST_AREA_Y_END,SPEED_LIMIT,VIDEO_FILE_NAME)
+    reset_vehicle_count()
     image_saver.reset_stored_value()
     vehicle_detection_api.reset_stored_value()
     vehicle_detection_api.set_roi_value(LINE_CROSSING_DETECTION_POS_TOP,LINE_CROSSING_DETECTION_POS_BOTTOM,
