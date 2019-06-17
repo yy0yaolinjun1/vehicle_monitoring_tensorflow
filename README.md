@@ -13,7 +13,7 @@ the speed of YOLO_V3 is about 20 to 35FPS(the speed based on the number of objec
 </p>
 
 
-##v2.0)Code Refactoring and Optimization:
+## v2.0)Code Refactoring and Optimization:
 		speed detection,converse running detection,running red line detection,and vehicle leave detection all share the same detection area
 		Avoiding repetitive detection
 ##	   New Capabilities:
@@ -29,7 +29,7 @@ the width of the vehicle bounding box that first appears in the video is large,w
   <img src="https://github.com/yy0yaolinjun1/ScreenShot/blob/master/TrafficMonitoring/double_line_crossing.JPG">
 </p>
 
-##v1.0) General Capabilities of This Project:
+## v1.0) General Capabilities of This Project:
 
 1) Real-time traffic monitoring(using ssd_mobilenet_v2 Model,more detection model see here https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md)
 
@@ -61,7 +61,7 @@ the width of the vehicle bounding box that first appears in the video is large,w
 
 
 
-## ##Notice:
+## Notice:
 	1)The variable with a value of 0 in the UI means it is no longer used in the v2.0 version.
 	2)The relevant code for vehicle detection is in vehicle_detection_api.py while the following variables in vehicle_detection_api.py should be modified according to the actual situation.
 		2.1)SPEED_DIRECTION:determine the default positive direction(default value:-1 from bottom to top;while 1: from top to bottom)	
@@ -81,7 +81,7 @@ ps:1)pip install missing_package_name
    2)please press 'q' to quit the preview before running video detection(one of the bugs that needed to be fixed...)
    3)For Chinese Users:文件路径不能带有中文，否则通过CV2写入图片会失败OVO//
    
-##future work(if time allows ~OvO~):
+## future work(if time allows ~OvO~):
 								  1)optmizing converse running detection
 								  2)UI modification
 							      3)using YOLO_V3
