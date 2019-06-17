@@ -961,7 +961,7 @@ def draw_roi(input_frame,counter):
 
     cv2.putText(
             input_frame,
-            'total_vehicle_count_in: ' + str(TOTAL_PASSED_VEHICLE_COUNT),
+            'total_vehicle_count: ' + str(TOTAL_PASSED_VEHICLE_COUNT),
             (10, 40),
             font,
             2,
